@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "title": "Laptop Gamer",
+    "description": "Laptop con RTX 4060",
+    "code": "LAP001",
+    "price": 2000,
+    "status": true,
+    "stock": 8,
+    "category": "computadoras",
+    "thumbnails": []
+  },
+  {
+    "id": 2,
+    "title": "Mouse Gamer",
+    "description": "Mouse RGB inalámbrico",
+    "code": "MOU001",
+    "price": 50,
+    "status": true,
+    "stock": 25,
+    "category": "accesorios",
+    "thumbnails": []
+  }
+]

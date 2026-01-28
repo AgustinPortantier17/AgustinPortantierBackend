@@ -1,0 +1,26 @@
+{
+  "name": "proyectofinal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AgustinPortantier17/AgustinPortantierBackend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AgustinPortantier17/AgustinPortantierBackend/issues"
+  },
+  "homepage": "https://github.com/AgustinPortantier17/AgustinPortantierBackend#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

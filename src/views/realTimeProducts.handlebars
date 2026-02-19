@@ -1,0 +1,151 @@
+<h1>{{title}}</h1>
+
+<div class="form-container">
+    <h2>Agregar Producto</h2>
+    <form id="addProductForm">
+        <div class="form-group">
+            <label for="title">Título:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="code">Código:</label>
+            <input type="text" id="code" name="code" required>
+        </div>
+        <div class="form-group">
+            <label for="price">Precio:</label>
+            <input type="number" id="price" name="price" step="0.01" required>
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Categoría:</label>
+            <input type="text" id="category" name="category" required>
+        </div>
+        <button type="submit" class="btn">Agregar Producto</button>
+    </form>
+</div>
+
+<div id="productsContainer" class="products-grid">
+    {{#if products.length}}
+        {{#each products}}
+        <div class="product-card" data-id="{{this.id}}">
+            <h3>{{this.title}}</h3>
+            <p>{{this.description}}</p>
+            <p class="product-code">Código: {{this.code}}</p>
+            <p class="product-price">${{this.price}}</p>
+            <p class="product-stock">Stock: {{this.stock}} unidades</p>
+            <p>Categoría: {{this.category}}</p>
+            <p>
+                <span class="status-badge {{#if this.status}}status-active{{else}}status-inactive{{/if}}">
+                    {{#if this.status}}Disponible{{else}}No Disponible{{/if}}
+                </span>
+            </p>
+            <p><small>ID: {{this.id}}</small></p>
+            <button class="btn btn-delete" onclick="deleteProduct({{this.id}})">Eliminar</button>
+        </div>
+        {{/each}}
+    {{else}}
+        <p style="grid-column: 1/-1; text-align: center; color: #666;">No hay productos disponibles</p>
+    {{/if}}
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    // Escuchar cuando se actualizan los productos
+    socket.on('updateProducts', (products) => {
+        renderProducts(products);
+    });
+
+    // Formulario para agregar producto
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            code: document.getElementById('code').value,
+            price: parseFloat(document.getElementById('price').value),
+            stock: parseInt(document.getElementById('stock').value),
+            category: document.getElementById('category').value,
+            status: true
+        };
+
+        try {
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                document.getElementById('addProductForm').reset();
+                alert('Producto agregado exitosamente');
+            } else {
+                const error = await response.json();
+                alert('Error: ' + error.message);
+            }
+        } catch (error) {
+            alert('Error al agregar producto: ' + error.message);
+        }
+    });
+
+    // Función para eliminar producto
+    async function deleteProduct(id) {
+        if (confirm('¿Estás seguro de eliminar este producto?')) {
+            try {
+                const response = await fetch(`/api/products/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Producto eliminado exitosamente');
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.message);
+                }
+            } catch (error) {
+                alert('Error al eliminar producto: ' + error.message);
+            }
+        }
+    }
+
+    // Función para renderizar productos
+    function renderProducts(products) {
+        const container = document.getElementById('productsContainer');
+        
+        if (products.length === 0) {
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">No hay productos disponibles</p>';
+            return;
+        }
+
+        container.innerHTML = products.map(product => `
+            <div class="product-card" data-id="${product.id}">
+                <h3>${product.title}</h3>
+                <p>${product.description}</p>
+                <p class="product-code">Código: ${product.code}</p>
+                <p class="product-price">$${product.price}</p>
+                <p class="product-stock">Stock: ${product.stock} unidades</p>
+                <p>Categoría: ${product.category}</p>
+                <p>
+                    <span class="status-badge ${product.status ? 'status-active' : 'status-inactive'}">
+                        ${product.status ? 'Disponible' : 'No Disponible'}
+                    </span>
+                </p>
+                <p><small>ID: ${product.id}</small></p>
+                <button class="btn btn-delete" onclick="deleteProduct(${product.id})">Eliminar</button>
+            </div>
+        `).join('');
+    }
+
+    console.log('Socket.io conectado');
+</script>
